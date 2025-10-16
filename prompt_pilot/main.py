@@ -51,7 +51,7 @@ if __name__ == "__main__":
     CODE_DIR = os.path.join(os.path.dirname(__file__), 'output', f'{model}_{RUN_TIME}', 'code')
     PREDICT_PATH = os.path.join(os.path.dirname(__file__), 'output', f'{model}_{RUN_TIME}', 'predict.json')
     INSTRUCT_PATH = os.path.join(os.path.dirname(__file__), 'prompts/code_instruct.txt')
-    SAMPLES_PATH = os.path.join(os.path.dirname(__file__), 'prompts/code_samples.txt')
+    SAMPLES_PATH = os.path.join(os.path.dirname(__file__), 'prompts/code_samples.py')
     QUESTION_PATH = os.path.join(os.path.dirname(__file__), 'question.json')
     API_JSON_PATH = os.path.join(os.path.dirname(__file__), 'API.json')
 

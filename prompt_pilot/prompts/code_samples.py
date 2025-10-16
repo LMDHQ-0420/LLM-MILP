@@ -16,7 +16,6 @@ end_date = "2025年10月19日"
 travel_days = 5
 peoples = 2
 
-
 def fetch_data():
     url = "http://localhost:12457"
     cross_city_train_departure = requests.get(
@@ -44,6 +43,7 @@ def get_trans_params(intra_city_trans, hotel_id, attr_id, param_type):
                 'bus_duration': float(data.get('bus_duration')),
                 'bus_cost': float(data.get('bus_cost'))
             }[param_type]
+        
 
 def build_model(cross_city_train_departure, cross_city_train_back, poi_data, intra_city_trans):
     model = pyo.ConcreteModel()
@@ -322,7 +322,9 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
 
     return model
 
-
+# ===========================================================
+# ===================== 以下内容禁止修改 =====================
+# ===========================================================
 def generate_date_range(start_date, end_date, date_format="%Y年%m月%d日"):
     start = datetime.strptime(start_date, date_format)
     end = datetime.strptime(end_date, date_format)
