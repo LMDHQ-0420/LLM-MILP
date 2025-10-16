@@ -83,3 +83,10 @@ def str2json(s):
         except json.JSONDecodeError:
             s_json = ast.literal_eval(s) 
     return s_json
+
+
+def sort_json_by_question_id(data):
+    sorted_data = sorted(data, key=lambda x: int(x['question_id']))
+    for item in sorted_data:
+        item['question_id'] = str(int(item['question_id'])) 
+    return sorted_data
