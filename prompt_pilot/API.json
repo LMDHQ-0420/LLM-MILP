@@ -1,0 +1,10 @@
+{
+  "deepseek-reasoner": {
+    "api_key": "sk-e16a24b6e56e48d0b0e32bdc4ec357ce",
+    "base_url": "https://api.deepseek.com/v1"
+  },
+  "default": {
+    "api_key": "sk-cf1542d339e84ebd9175434cb4d246d1",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  }
+}
