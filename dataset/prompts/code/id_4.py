@@ -11,12 +11,12 @@ from pyomo.opt import TerminationCondition
 import requests
 from pyomo.opt import SolverStatus
 
-origin_city = "深圳市"
+origin_city = "广州市"
 destination_city = "成都市"
 budget = 0
 start_date = "2025年6月22日"
-end_date = "2025年6月24日"
-travel_days = 3
+end_date = "2025年6月22日"
+travel_days = 1
 peoples = 1
 
 
@@ -258,7 +258,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
             model.select_rest[d, r]
             for r in model.restaurants
             for d in days
-            if model.rest_data[r]['duration'] + model.rest_data[r]['queue_time'] > 120
+            if model.rest_data[r]['duration'] + model.rest_data[r]['queue_time'] < 120
         ) == 0
     )
 
@@ -419,8 +419,8 @@ def generate_poi(model, intra_city_trans):
             select_re.append(r['id'])
 
     return {
-        "query_id": "15",
-        "query": "2025年06月22日至2025年06月24日，我计划从深圳市前往成都市旅游，不计预算，不限制预算，希望品尝当地的特色川菜，用餐时间与排队时间之和不能超过120分钟,尽量减少不必要的开销。",
+        "query_id": "4",
+        "query": "2025年06月22日至2025年06月22日，我计划从广州市前往成都市旅游，希望品尝当地的特色火锅，用餐时间与排队时间之和不能超过120分钟，不限制预算但是尽量减少开销。",
         "travel_days": travel_days,
         "budget": budget,
         "peoples": peoples,

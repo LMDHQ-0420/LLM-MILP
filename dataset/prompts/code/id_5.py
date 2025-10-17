@@ -19,7 +19,7 @@ def fetch_data():
         url + f"/cross-city-transport?origin_city={origin_city}&destination_city={destination_city}").json()
     cross_city_train_back = requests.get(
         url + f"/cross-city-transport?origin_city={destination_city}&destination_city={origin_city}").json()
-
+    print(cross_city_train_departure)
     poi_data = {
         'attractions': requests.get(url + f"/attractions/{destination_city}").json(),
         'accommodations': requests.get(url + f"/accommodations/{destination_city}").json(),
@@ -207,7 +207,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
                                    for t in model.train_departure)
         train_back_cost = sum(model.select_train_back[t] * model.train_back_data[t]['cost']
                               for t in model.train_back)
-        return rating + attraction_duration - transport_cost - queue_time - (peoples + 1) //2 * hotel_cost - transport_cost - peoples * (
+        return rating + attraction_duration - transport_cost - queue_time - (peoples + 1) //2 * hotel_cost - peoples * (
                 attraction_cost + restaurant_cost + train_departure_cost + train_back_cost)
     model.obj = pyo.Objective(rule=obj_rule, sense=pyo.maximize)
 
@@ -330,7 +330,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
             model.select_attr[d, a]
             for a in model.attractions
             for d in days
-            if '吴山大观' in model.attr_data[a]['name']
+            if '钱塘江大桥' in model.attr_data[a]['name']
         ) >= 1
     )
 
@@ -339,7 +339,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
             model.select_attr[d, a]
             for a in model.attractions
             for d in days
-            if '皋亭山' in model.attr_data[a]['name']
+            if '钱江龙' in model.attr_data[a]['name']
         ) >= 1
     )
 
@@ -348,7 +348,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
             model.select_attr[d, a]
             for a in model.attractions
             for d in days
-            if '坝子桥' in model.attr_data[a]['name']
+            if '黄龙洞' in model.attr_data[a]['name']
         ) >= 1
     )
 
@@ -501,7 +501,7 @@ def generate_poi(model, intra_city_trans):
 
     return {
         "query_id": "5",
-        "query": "我计划于2025年1月10日至12日从广州出发前往杭州，开启为期3天的高性价比旅行，总预算控制在10000元以内。旅行要求包括：全程入住五星级及以上标准酒店，行程需覆盖吴山大观、皋亭山、坝子桥等经典景点，并安排一次黄焖鸡米饭与茶叶蛋的本地餐饮体验；10日早上出发，12日晚返回，控制预算同时兼顾景点品质、用餐体验与住宿舒适度，优先规划紧凑合理路线，尽量延长游玩时间、减少通勤和排队时间。",
+        "query": "我计划于2025年1月10日至12日从广州出发前往杭州，开启为期3天的高性价比旅行，总预算控制在14000元以内。旅行要求包括：全程入住五星级酒店，行程需覆盖钱塘江大桥、钱江龙、黄龙洞等经典景点，并安排一次黄焖鸡米饭与茶叶蛋的本地餐饮体验；10日早上出发，12日晚返回，控制预算同时兼顾景点品质、用餐体验与住宿舒适度，优先规划紧凑合理路线，尽量延长游玩时间、减少通勤和排队时间。",
         "travel_days": travel_days,
         "budget": budget,
         "peoples": peoples,

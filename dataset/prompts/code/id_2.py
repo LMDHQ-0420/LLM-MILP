@@ -11,8 +11,8 @@ origin_city = "武汉市"
 destination_city = "厦门市"
 budget = 20000
 start_date = "2025年7月1日"
-end_date = "2025年7月6日"
-travel_days = 6
+end_date = "2025年7月3日"
+travel_days = 3
 peoples = 1
 
 
@@ -58,7 +58,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
     attraction_dict = {a['id']: a for a in poi_data['attractions']}
     hotel_dict = {h['id']: h for h in poi_data['accommodations']}
     restaurant_dict = {r['id']: r for r in poi_data['restaurants']}
-    train_departure_dict = {t['train_number']: t for t in cross_city_train_departure if t['train_number'] == 'G2045'}
+    train_departure_dict = {t['train_number']: t for t in cross_city_train_departure if t['train_number'] == 'D3286'}
     train_back_dict = {t['train_number']: t for t in cross_city_train_back}
 
     model.attractions = pyo.Set(initialize=attraction_dict.keys())
@@ -176,32 +176,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
                      for d in model.days for r in model.restaurants) + \
                  sum(model.select_hotel[h] * model.hotel_data[h]['rating']
                      for h in model.accommodations)
-        hotel_cost = sum(model.select_hotel[h] * model.hotel_data[h]['cost'] * (travel_days - 1)
-                         for h in model.accommodations)
-        attraction_cost = sum(model.select_attr[d, a] * model.attr_data[a]['cost']
-                              for d in model.days for a in model.attractions)
-        restaurant_cost = sum(model.select_rest[d, r] * model.rest_data[r]['cost']
-                              for d in model.days for r in model.restaurants)
-        transport_cost = sum(
-            model.attr_hotel[d, a, h] * (
-                    (1 - model.trans_mode[d]) * (
-                    get_trans_params(intra_city_trans, h, a, 'taxi_cost') + \
-                    get_trans_params(intra_city_trans, a, h, 'taxi_cost')
-            ) + \
-                    peoples * model.trans_mode[d] * (
-                            get_trans_params(intra_city_trans, h, a, 'bus_cost') + \
-                            get_trans_params(intra_city_trans, a, h, 'bus_cost')
-                    )
-            )
-            for d in model.days
-            for a in model.attractions
-            for h in model.accommodations)
-        train_departure_cost = sum(model.select_train_departure[t] * model.train_departure_data[t]['cost']
-                                   for t in model.train_departure)
-        train_back_cost = sum(model.select_train_back[t] * model.train_back_data[t]['cost']
-                              for t in model.train_back)
-        return rating - transport_cost - (peoples+1) // 2 * hotel_cost - peoples * (
-                      attraction_cost + restaurant_cost + train_departure_cost + train_back_cost)
+        return rating
 
     model.obj = pyo.Objective(rule=obj_rule, sense=pyo.maximize)
 
@@ -314,7 +289,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
             model.select_rest[d, r]
             for r in model.restaurants
             for d in days
-            if '福建菜' in model.rest_data[r]['type']
+            if '茶艺馆' in model.rest_data[r]['type']
         ) >= 1
     )
 
@@ -473,7 +448,7 @@ def generate_poi(model, intra_city_trans):
 
     return {
         "query_id": "2",
-        "query": "2025年7月1日上午，我将从武汉大学地铁站启程前往厦门，开启为期6天的旅行，并于7月6日晚搭乘高铁返程。出发交通指定搭乘G2045次高铁，本次旅行预算控制在20000元以内，期望能深入体验厦门的本地文化与自然风景。请优先安排POI评分高的景点、餐厅与住宿，入住三星级以上宾馆，要求含早餐，且至少吃一次福建菜，并确保每日动线紧凑、交通方便，提升整体出行舒适度。",
+        "query": "2025年7月1日上午，我将从武汉大学地铁站启程前往厦门，开启为期3天的旅行，并于7月3日晚搭乘高铁返程。出发交通指定搭乘D3286次高铁，本次旅行预算控制在20000元以内，期望能深入体验厦门的本地文化与自然风景。请优先安排POI评分高的景点、餐厅与住宿，入住三星级以上宾馆，要求含早餐，且至少吃一次茶艺馆，并确保每日动线紧凑、交通方便，提升整体出行舒适度。",
         "travel_days":travel_days,
         "budget": budget,
         "peoples": peoples,

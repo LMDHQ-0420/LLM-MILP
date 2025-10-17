@@ -7,6 +7,7 @@ import time
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+import re
 
 
 def _load_api_config(model: str, path: str):
@@ -46,17 +47,21 @@ def _ask_llm(prompt, instruct, model_name, client):
 def process_single_question(question_data, code_dir, instruct_path, sample_path, model_name, client):
     question_id = question_data['question_id']
     question = question_data['question']
-    
     print(f"正在输出第{question_id}个问题的代码...")
-    
     instruct = _read_prompt(instruct_path)
     sample = _read_prompt(sample_path)
     prompt = _create_code_prompt(question, sample)
-    result = _ask_llm(prompt, instruct, model_name, client)
-    code = result.split('```code_begin')[1].split('```code_end')[0]
-    
-    code_path = f"{code_dir}/id_{question_id}.py"
-    save_file(code_path, code)
+    for attempt in range(3):
+        result = _ask_llm(prompt, instruct, model_name, client)
+        if '```code_begin' in result and '```code_end' in result:
+            code = result.split('```code_begin')[1].split('```code_end')[0]
+            code = code.encode('utf-8').decode('utf-8-sig')  # 去除BOM
+            code = re.sub(r'[^\x09\x0A\x0D\x20-\x7E\u4e00-\u9fa5]', '', code)  # 去除不可见字符
+            code_path = f"{code_dir}/id_{question_id}.py"
+            save_file(code_path, code)
+            break
+        else:
+            print(f"问题 {question_id} 第{attempt+1}次请求失败: LLM返回内容格式异常")
 
     return {
         "question_id": question_id,

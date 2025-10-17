@@ -7,12 +7,12 @@ import requests
 from pyomo.opt import SolverStatus
 
 # 用户输入
-origin_city = "北京市"
+origin_city = "杭州市"
 destination_city = "苏州市"
 budget = 8500
 start_date = "2025年6月10日"
-end_date = "2025年6月12日"
-travel_days = 3
+end_date = "2025年6月11日"
+travel_days = 2
 peoples = 1
 
 
@@ -21,6 +21,7 @@ def fetch_data():
     url = "http://localhost:12457"
     cross_city_train_departure = requests.get(
         url + f"/cross-city-transport?origin_city={origin_city}&destination_city={destination_city}").json()
+
     cross_city_train_back = requests.get(
         url + f"/cross-city-transport?origin_city={destination_city}&destination_city={origin_city}").json()
 
@@ -296,7 +297,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
 
     model.transport_type = pyo.Constraint(
         model.days,
-        rule=lambda m, d: m.trans_mode[d] == 1  # 市内交通以打车为主
+        rule=lambda m, d: m.trans_mode[d] == 0  # 市内交通以打车为主
     )
 
     return model
@@ -453,7 +454,7 @@ def generate_poi(model, intra_city_trans):
 
     return {
         "query_id": "1",
-        "query": "2025年6月10日至6月12日，我想去苏州旅游，请帮我制定一个为期3天的旅游计划，我的预算是8500元，出发地点是北京西站。6月10日上午从北京出发，6月12日晚从苏州乘坐高铁返回。此次行程希望安排高评分的景点、餐厅和住宿，市内交通以打车为主，整体行程要舒适、动线合理，并能体验苏州的文化韵味。",
+        "query": "2025年6月10日至6月11日，我想去苏州旅游，请帮我制定一个为期2天的高性价比旅游计划，我的预算是8500元，出发地点是杭州。6月10日上午从杭州出发，6月11日晚从苏州乘坐高铁返回。此次行程希望市内交通以打车为主，整体行程要控制花费、舒适、动线合理，并能体验苏州的文化韵味。",
         "travel_days":travel_days,
         "budget": budget,
         "peoples": peoples,

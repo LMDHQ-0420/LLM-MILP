@@ -5,12 +5,12 @@ from datetime import datetime
 import requests
 import math
 
-origin_city = "广州市"
+origin_city = "武汉市"
 destination_city = "北京市"
 budget = 20000
 start_date = "2025年10月15日"
-end_date = "2025年10月19日"
-travel_days = 5
+end_date = "2025年10月16日"
+travel_days = 2
 peoples = 2
 
 
@@ -49,8 +49,8 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
     attraction_dict = {a['id']: a for a in poi_data['attractions']}
     hotel_dict = {h['id']: h for h in poi_data['accommodations']}
     restaurant_dict = {r['id']: r for r in poi_data['restaurants']}
-    train_departure_dict = {t['train_number']: t for t in cross_city_train_departure if t['origin_station'] == '广州南站'}
-    train_back_dict = {t['train_number']: t for t in cross_city_train_back if t['train_number'] == 'G335'}
+    train_departure_dict = {t['train_number']: t for t in cross_city_train_departure if t['origin_station'] == '武昌站'}
+    train_back_dict = {t['train_number']: t for t in cross_city_train_back if t['train_number'] == 'K599'}
 
     model.attractions = pyo.Set(initialize=attraction_dict.keys())
     model.accommodations = pyo.Set(initialize=hotel_dict.keys())
@@ -295,7 +295,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
             model.select_rest[d, r]
             for r in model.restaurants
             for d in days
-            if '烤鸭' in model.rest_data[r]['recommended_food']
+            if '鸡丝凉面' in model.rest_data[r]['recommended_food']
         ) >= 1
     )
 
@@ -304,7 +304,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
             model.select_attr[d, a]
             for a in model.attractions
             for d in days
-            if '颐和园' in model.attr_data[a]['name']
+            if '地坛公园' in model.attr_data[a]['name']
         ) >= 1
     )
 
@@ -313,7 +313,7 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
             model.select_attr[d, a]
             for a in model.attractions
             for d in days
-            if '恭王府博物馆' in model.attr_data[a]['name']
+            if '故宫' in model.attr_data[a]['name']
         ) >= 1
     )
 
@@ -466,7 +466,7 @@ def generate_poi(model, intra_city_trans):
 
     return {
         "query_id": "3",
-        "query": "我计划于2025年10月15日至19日从广州前往北京开展为期五天的高品质双人旅行，总预算为20000元，需满足以下需求：全程入住四星级及以上标准酒店，行程中须包含颐和园、故宫等风景名胜，并安排一次正宗老北京烤鸭体验。15日早上从广州南站出发，19日晚乘坐G335号高铁返回广州。每日行程需兼顾热门景点与合理动线，避免过度奔波，市内交通以打车为主，整体行程注重舒适性与文化深度，尽量延长游玩时间、减少通勤和排队时间。",
+        "query": "我计划于2025年10月15日至16日从武汉前往北京开展为期两天的高品质双人旅行，总预算为20000元，需满足以下需求：全程入住四星级及以上标准酒店，行程中须包含地坛公园、故宫等风景名胜，并安排一次正宗鸡丝凉面体验。15日早上从武昌站出发，16日晚乘坐K599号高铁返回武汉。每日行程需兼顾热门景点与合理动线，避免过度奔波，市内交通以打车为主，整体行程注重舒适性与文化深度，尽量延长游玩时间、减少通勤和排队时间。",
         "travel_days": travel_days,
         "budget": budget,
         "peoples": peoples,

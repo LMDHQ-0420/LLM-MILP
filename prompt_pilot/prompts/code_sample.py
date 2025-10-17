@@ -8,6 +8,10 @@ import pyomo.environ as pyo
 from datetime import datetime
 import requests
 
+# ================================================================
+# ===================== 这里是可以修改的范围起始 =====================
+# ================================================================
+
 origin_city = "洛阳市"
 destination_city = "北京市"
 budget = 20000
@@ -15,34 +19,6 @@ start_date = "2025年10月15日"
 end_date = "2025年10月19日"
 travel_days = 5
 peoples = 2
-
-def fetch_data():
-    url = "http://localhost:12457"
-    cross_city_train_departure = requests.get(
-        url + f"/cross-city-transport?origin_city={origin_city}&destination_city={destination_city}").json()
-    cross_city_train_back = requests.get(
-        url + f"/cross-city-transport?origin_city={destination_city}&destination_city={origin_city}").json()
-
-    poi_data = {
-        'attractions': requests.get(url + f"/attractions/{destination_city}").json(),
-        'accommodations': requests.get(url + f"/accommodations/{destination_city}").json(),
-        'restaurants': requests.get(url + f"/restaurants/{destination_city}").json()
-    }
-
-    intra_city_trans = requests.get(url + f"/intra-city-transport/{destination_city}").json()
-    return cross_city_train_departure, cross_city_train_back, poi_data, intra_city_trans
-
-
-def get_trans_params(intra_city_trans, hotel_id, attr_id, param_type):
-    for key in [f"{hotel_id},{attr_id}", f"{attr_id},{hotel_id}"]:
-        if key in intra_city_trans:
-            data = intra_city_trans[key]
-            return {
-                'taxi_duration': float(data.get('taxi_duration')),
-                'taxi_cost': float(data.get('taxi_cost')),
-                'bus_duration': float(data.get('bus_duration')),
-                'bus_cost': float(data.get('bus_cost'))
-            }[param_type]
         
 
 def build_model(cross_city_train_departure, cross_city_train_back, poi_data, intra_city_trans):
@@ -322,9 +298,40 @@ def build_model(cross_city_train_departure, cross_city_train_back, poi_data, int
 
     return model
 
-# ===========================================================
-# ===================== 以下内容禁止修改 =====================
-# ===========================================================
+# ================================================================
+# ===================== 这里是可以修改的范围结束 =====================
+# ================================================================
+
+
+def fetch_data():
+    url = "http://localhost:12457"
+    cross_city_train_departure = requests.get(
+        url + f"/cross-city-transport?origin_city={origin_city}&destination_city={destination_city}").json()
+    cross_city_train_back = requests.get(
+        url + f"/cross-city-transport?origin_city={destination_city}&destination_city={origin_city}").json()
+
+    poi_data = {
+        'attractions': requests.get(url + f"/attractions/{destination_city}").json(),
+        'accommodations': requests.get(url + f"/accommodations/{destination_city}").json(),
+        'restaurants': requests.get(url + f"/restaurants/{destination_city}").json()
+    }
+
+    intra_city_trans = requests.get(url + f"/intra-city-transport/{destination_city}").json()
+    return cross_city_train_departure, cross_city_train_back, poi_data, intra_city_trans
+
+
+def get_trans_params(intra_city_trans, hotel_id, attr_id, param_type):
+    for key in [f"{hotel_id},{attr_id}", f"{attr_id},{hotel_id}"]:
+        if key in intra_city_trans:
+            data = intra_city_trans[key]
+            return {
+                'taxi_duration': float(data.get('taxi_duration')),
+                'taxi_cost': float(data.get('taxi_cost')),
+                'bus_duration': float(data.get('bus_duration')),
+                'bus_cost': float(data.get('bus_cost'))
+            }[param_type]
+        
+
 def generate_date_range(start_date, end_date, date_format="%Y年%m月%d日"):
     start = datetime.strptime(start_date, date_format)
     end = datetime.strptime(end_date, date_format)
